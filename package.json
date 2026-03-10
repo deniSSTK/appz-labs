@@ -5,10 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "run:1": "cd src/1 && npx ts-node main.ts"
+    "run:1": "cd src/1 && npx ts-node main.ts",
+    "run:2": "cd src/2 && npx ts-node main.ts"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@types/node": "^25.4.0",
     "typescript": "^5.5.3"
   },
   "private": true
