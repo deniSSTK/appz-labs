@@ -1,0 +1,26 @@
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { AudienceType } from '../../shared/enums';
+
+@Entity({ name: 'expositions' })
+export class ExpositionEntity {
+    @PrimaryGeneratedColumn('uuid')
+    public id!: string;
+
+    @Column()
+    public title!: string;
+
+    @Column()
+    public theme!: string;
+
+    @Column({ type: 'varchar' })
+    public audienceType!: AudienceType;
+
+    @Column()
+    public hall!: string;
+
+    @Column('float')
+    public baseTicketPrice!: number;
+
+    @Column()
+    public description!: string;
+}

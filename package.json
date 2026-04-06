@@ -6,10 +6,19 @@
   "scripts": {
     "build": "tsc",
     "run:1": "cd src/1 && npx ts-node main.ts",
-    "run:2": "cd src/2 && npx ts-node main.ts"
+    "run:2": "cd src/2 && npx ts-node main.ts",
+    "run:3": "npx ts-node src/3/main.ts"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "reflect-metadata": "^0.2.2",
+    "sql.js": "^1.13.0",
+    "typeorm": "^0.3.27"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^25.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   },
   "private": true
