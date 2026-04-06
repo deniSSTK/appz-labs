@@ -81,10 +81,7 @@ export abstract class Discipline {
 
     public endCourse(): void {
         this.teacher.unlock();
-        this.notifier.notify(
-            `Course ${this.name} ended`,
-            this.name
-        );
+        this.notifier.notify(`Course ${this.name} ended`, this.name);
     }
 
     public canCreateSubgroup(): boolean {

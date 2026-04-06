@@ -8,7 +8,9 @@ import { MuseumMapper } from '../infra/mappers/MuseumMapper';
 export class ExcursionController {
     public readonly router: Router;
 
-    constructor(@inject(TYPES.ExcursionService) private readonly excursionService: IExcursionService) {
+    constructor(
+        @inject(TYPES.ExcursionService) private readonly excursionService: IExcursionService
+    ) {
         this.router = Router();
         this.router.get('/', this.getAllExcursions);
         this.router.post('/', this.createExcursion);

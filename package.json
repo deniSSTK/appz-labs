@@ -1,27 +1,37 @@
 {
-  "name": "appz-labs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "run:1": "cd src/1 && npx ts-node main.ts",
-    "run:2": "cd src/2 && npx ts-node main.ts",
-    "run:3-4": "npx ts-node src/3-4/main.ts"
-  },
-  "dependencies": {
-    "@types/inversify": "^2.0.32",
-    "express": "^5.2.1",
-    "inversify": "^7.11.0",
-    "reflect-metadata": "^0.2.2",
-    "sql.js": "^1.13.0",
-    "typeorm": "^0.3.27"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.4.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
-  },
-  "private": true
+    "name": "appz-labs",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier . --write",
+        "format:check": "prettier . --check",
+        "run:1": "cd src/1 && npx ts-node main.ts",
+        "run:2": "cd src/2 && npx ts-node main.ts",
+        "run:3-4": "npx ts-node src/3-4/main.ts"
+    },
+    "dependencies": {
+        "@types/inversify": "^2.0.32",
+        "express": "^5.2.1",
+        "inversify": "^7.11.0",
+        "reflect-metadata": "^0.2.2",
+        "sql.js": "^1.13.0",
+        "typeorm": "^0.3.27"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.38.0",
+        "@types/express": "^5.0.6",
+        "@types/node": "^25.4.0",
+        "eslint": "^9.38.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^16.4.0",
+        "prettier": "^3.6.2",
+        "ts-node": "^10.9.2",
+        "typescript-eslint": "^8.46.1",
+        "typescript": "^5.5.3"
+    },
+    "private": true
 }

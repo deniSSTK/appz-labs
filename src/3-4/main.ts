@@ -97,11 +97,11 @@ async function main(): Promise<void> {
     app.listen(port, () => {
         console.log(`Museum API is running on http://localhost:${port}`);
         console.log('Available endpoints:');
-        endpoints.forEach(endpoint => console.log(`  ${endpoint}`));
+        endpoints.forEach((endpoint) => console.log(`  ${endpoint}`));
     });
 }
 
-main().catch(error => {
+main().catch((error) => {
     console.error('Failed to start museum application:', error);
     process.exit(1);
 });

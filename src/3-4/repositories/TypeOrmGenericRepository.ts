@@ -1,9 +1,10 @@
 import { DeepPartial, FindOptionsWhere, ObjectLiteral, Repository } from 'typeorm';
 import { IGenericRepository } from './interfaces/IGenericRepository';
 
-export class TypeOrmGenericRepository<TDomain, TEntity extends ObjectLiteral & { id: string }>
-    implements IGenericRepository<TDomain>
-{
+export class TypeOrmGenericRepository<
+    TDomain,
+    TEntity extends ObjectLiteral & { id: string }
+> implements IGenericRepository<TDomain> {
     constructor(
         protected readonly repository: Repository<TEntity>,
         protected readonly toDomain: (entity: TEntity) => TDomain,
@@ -25,7 +26,9 @@ export class TypeOrmGenericRepository<TDomain, TEntity extends ObjectLiteral & {
     public async add(entity: TDomain): Promise<TDomain> {
         const dalEntity = this.toEntity(entity);
         const { id, ...rest } = dalEntity as TEntity;
-        const saved = await this.repository.save(this.repository.create(rest as DeepPartial<TEntity>));
+        const saved = await this.repository.save(
+            this.repository.create(rest as DeepPartial<TEntity>)
+        );
         return this.toDomain(saved);
     }
 

@@ -6,14 +6,16 @@ import { DisciplineFactory } from './factories/DisciplineFactory';
 
 class ConsoleLogger implements IDisciplineObserver {
     update(eventArgs: DisciplineEventArgs): void {
-        console.log(`[${eventArgs.timestamp.toISOString()}] ${eventArgs.sender}: ${eventArgs.message}`);
+        console.log(
+            `[${eventArgs.timestamp.toISOString()}] ${eventArgs.sender}: ${eventArgs.message}`
+        );
     }
 }
 
 function main(): void {
     const notifier = new DisciplineNotifier();
     const logger = new ConsoleLogger();
-    
+
     notifier.subscribe(logger);
 
     const physicsTeacher = new Teacher('Dr. Smith');
@@ -50,12 +52,14 @@ function main(): void {
     ];
 
     console.log('=== Physics Enrollment ===');
-    students.forEach(student => physics.enrollStudent(student));
-    
+    students.forEach((student) => physics.enrollStudent(student));
+
     console.log('\n=== Attempting to start Physics course ===');
     physics.startCourse();
-    
-    console.log('\n=== Attempting to enroll another student in Physics (should fail - teacher busy) ===');
+
+    console.log(
+        '\n=== Attempting to enroll another student in Physics (should fail - teacher busy) ==='
+    );
     const extraStudent = new Student('Peter', 'S016');
     physics.enrollStudent(extraStudent);
 
@@ -63,20 +67,20 @@ function main(): void {
     physics.endCourse();
 
     console.log('\n=== English Enrollment ===');
-    students.slice(0, 13).forEach(student => english.enrollStudent(student));
-    
+    students.slice(0, 13).forEach((student) => english.enrollStudent(student));
+
     console.log('\n=== Starting English course ===');
     english.startCourse();
 
     console.log('\n=== Math Enrollment (insufficient students) ===');
-    students.slice(0, 10).forEach(student => math.enrollStudent(student));
-    
+    students.slice(0, 10).forEach((student) => math.enrollStudent(student));
+
     console.log('\n=== Attempting to start Math course (should fail) ===');
     math.startCourse();
 
     console.log('\n=== Adding more students to Math ===');
-    students.slice(10, 15).forEach(student => math.enrollStudent(student));
-    
+    students.slice(10, 15).forEach((student) => math.enrollStudent(student));
+
     console.log('\n=== Starting Math course ===');
     math.startCourse();
 

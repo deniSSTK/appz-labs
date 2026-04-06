@@ -3,7 +3,7 @@ import { StudentGroup } from './StudentGroup';
 
 export abstract class Discipline {
     protected completedWorks: Map<string, number> = new Map();
-    
+
     constructor(
         public title: string,
         public teacher: Teacher | null = null,
@@ -36,9 +36,11 @@ export abstract class Discipline {
     checkExamAccess(studentId: string): boolean {
         const completedWorkCount = this.completedWorks.get(studentId) || 0;
         const requiredWorkCount = this.getRequiredWorkCount();
-        
+
         if (completedWorkCount < requiredWorkCount) {
-            throw new Error(`Student ${studentId} needs ${requiredWorkCount - completedWorkCount} more works to access exam`);
+            throw new Error(
+                `Student ${studentId} needs ${requiredWorkCount - completedWorkCount} more works to access exam`
+            );
         }
         return true;
     }
@@ -48,7 +50,9 @@ export abstract class Discipline {
     submitWork(studentId: string): void {
         const current = this.completedWorks.get(studentId) || 0;
         this.completedWorks.set(studentId, current + 1);
-        this.onNotify(`Student ${studentId} submitted work for ${this.title} (${current + 1}/${this.getRequiredWorkCount()})`);
+        this.onNotify(
+            `Student ${studentId} submitted work for ${this.title} (${current + 1}/${this.getRequiredWorkCount()})`
+        );
     }
 
     abstract conductLecture?(): void;

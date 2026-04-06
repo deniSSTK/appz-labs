@@ -1,10 +1,10 @@
 import { Teacher } from '../models/Teacher';
 import { Discipline } from '../models/Discipline';
 import { DisciplineNotifier } from '../patterns/DisciplineNotifier';
-import { 
+import {
     PhysicsValidation,
-    EnglishValidation, 
-    StandardValidation 
+    EnglishValidation,
+    StandardValidation
 } from '../strategies/ValidationStrategies';
 
 export class Physics extends Discipline {

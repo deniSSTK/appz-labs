@@ -17,7 +17,7 @@ export class DisciplineNotifier {
 
     public notify(message: string, sender: string): void {
         const eventArgs = new DisciplineEventArgs(message, sender);
-        this.observers.forEach(observer => observer.update(eventArgs));
+        this.observers.forEach((observer) => observer.update(eventArgs));
     }
 
     public getObserverCount(): number {
