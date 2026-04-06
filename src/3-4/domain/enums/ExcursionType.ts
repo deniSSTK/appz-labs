@@ -1,4 +1,4 @@
 export enum ExcursionType {
-    Regular = 'regular',
-    Custom = 'custom'
+  Regular = 'regular',
+  Custom = 'custom'
 }

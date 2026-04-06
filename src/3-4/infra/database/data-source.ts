@@ -5,8 +5,8 @@ import { ExhibitionScheduleEntity } from '../../repositories/entities/Exhibition
 import { ExcursionEntity } from '../../repositories/entities/ExcursionEntity';
 
 export const museumDataSource = new DataSource({
-    type: 'sqljs',
-    synchronize: true,
-    logging: false,
-    entities: [ExpositionEntity, ExhibitionScheduleEntity, ExcursionEntity]
+  type: 'sqljs',
+  synchronize: true,
+  logging: false,
+  entities: [ExpositionEntity, ExhibitionScheduleEntity, ExcursionEntity]
 });

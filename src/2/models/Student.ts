@@ -1,14 +1,14 @@
 export class Student {
-    constructor(
-        private readonly name: string,
-        private readonly id: string
-    ) {}
+  constructor(
+    private readonly name: string,
+    private readonly id: string
+  ) {}
 
-    public getName(): string {
-        return this.name;
-    }
+  public getName(): string {
+    return this.name;
+  }
 
-    public getId(): string {
-        return this.id;
-    }
+  public getId(): string {
+    return this.id;
+  }
 }
