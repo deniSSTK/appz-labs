@@ -26,6 +26,14 @@ export abstract class Discipline {
     return this.students.length;
   }
 
+  public getEnrolledStudents(): Student[] {
+    return this.students;
+  }
+
+  public isStudentEnrolled(studentId: string): boolean {
+    return this.students.some((student) => student.getId() === studentId);
+  }
+
   public getActivityRequirements(): string[] {
     return this.validationStrategy.getActivityRequirements();
   }

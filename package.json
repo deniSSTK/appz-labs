@@ -14,12 +14,16 @@
     "run:3-4": "npx ts-node src/3-4/main.ts"
   },
   "dependencies": {
+    "@types/inquirer": "^9.0.9",
     "@types/inversify": "^2.0.32",
+    "@types/uuid": "^10.0.0",
     "express": "^5.2.1",
+    "inquirer": "^13.4.2",
     "inversify": "^7.11.0",
     "reflect-metadata": "^0.2.2",
     "sql.js": "^1.13.0",
-    "typeorm": "^0.3.27"
+    "typeorm": "^0.3.27",
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
@@ -30,8 +34,8 @@
     "globals": "^16.4.0",
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
-    "typescript-eslint": "^8.46.1",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.46.1"
   },
   "private": true
 }
