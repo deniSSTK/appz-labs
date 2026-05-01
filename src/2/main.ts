@@ -281,9 +281,7 @@ class UniversityManagementSystem {
           .map((d) => d.getName());
 
         console.log(`${index + 1}. ${student.getName()} (${student.getId()})`);
-        console.log(
-          `   Enrolled in: ${enrollments.length > 0 ? enrollments.join(', ') : 'None'}`
-        );
+        console.log(`   Enrolled in: ${enrollments.length > 0 ? enrollments.join(', ') : 'None'}`);
       });
     }
   }
