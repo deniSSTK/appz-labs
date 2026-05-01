@@ -36,21 +36,21 @@ class UniversityManagementSystem {
     ];
 
     this.students = [
-      new Student('Alice', uuidv4()),
-      new Student('Bob', uuidv4()),
-      new Student('Charlie', uuidv4()),
-      new Student('Diana', uuidv4()),
-      new Student('Eve', uuidv4()),
-      new Student('Frank', uuidv4()),
-      new Student('Grace', uuidv4()),
-      new Student('Henry', uuidv4()),
-      new Student('Iris', uuidv4()),
-      new Student('Jack', uuidv4()),
-      new Student('Kate', uuidv4()),
-      new Student('Leo', uuidv4()),
-      new Student('Maya', uuidv4()),
-      new Student('Noah', uuidv4()),
-      new Student('Olivia', uuidv4())
+      new Student('Alice'),
+      new Student('Bob'),
+      new Student('Charlie'),
+      new Student('Diana'),
+      new Student('Eve'),
+      new Student('Frank'),
+      new Student('Grace'),
+      new Student('Henry'),
+      new Student('Iris'),
+      new Student('Jack'),
+      new Student('Kate'),
+      new Student('Leo'),
+      new Student('Maya'),
+      new Student('Noah'),
+      new Student('Olivia')
     ];
 
     this.disciplines = [
@@ -202,7 +202,7 @@ class UniversityManagementSystem {
     } else {
       this.students.forEach((student, index) => {
         const enrollments = this.disciplines
-          .filter((d) => d.getStudentCount() > 0 && d.getTeacher().isBusy())
+          .filter((d) => d.isStudentEnrolled(student.getId()))
           .map((d) => d.getName());
 
         console.log(`${index + 1}. ${student.getName()} (${student.getId()})`);
@@ -221,8 +221,7 @@ class UniversityManagementSystem {
       }
     ]);
 
-    const studentId = uuidv4();
-    const newStudent = new Student(name, studentId);
+    const newStudent = new Student(name);
     this.students.push(newStudent);
 
     console.log(`\nStudent ${newStudent.getName()} (${newStudent.getId()}) added successfully!`);
@@ -279,12 +278,12 @@ class UniversityManagementSystem {
     } else {
       foundStudents.forEach((student, index) => {
         const enrollments = this.disciplines
-          .filter((d) => d.getStudentCount() > 0)
+          .filter((d) => d.isStudentEnrolled(student.getId()))
           .map((d) => d.getName());
 
         console.log(`${index + 1}. ${student.getName()} (${student.getId()})`);
         console.log(
-          `   Available disciplines: ${enrollments.length > 0 ? enrollments.join(', ') : 'None'}`
+          `   Enrolled in: ${enrollments.length > 0 ? enrollments.join(', ') : 'None'}`
         );
       });
     }
