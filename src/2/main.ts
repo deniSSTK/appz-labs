@@ -1,5 +1,4 @@
 import inquirer from 'inquirer';
-import { v4 as uuidv4 } from 'uuid';
 import { Teacher } from './models/Teacher';
 import { Student } from './models/Student';
 import { DisciplineNotifier, IDisciplineObserver } from './patterns/DisciplineNotifier';
