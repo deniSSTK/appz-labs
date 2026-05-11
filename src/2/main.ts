@@ -2,13 +2,33 @@ import inquirer from 'inquirer';
 import { Teacher } from './models/Teacher';
 import { Student } from './models/Student';
 import { DisciplineNotifier, IDisciplineObserver } from './patterns/DisciplineNotifier';
-import { DisciplineEventArgs } from './patterns/DisciplineEventArgs';
+import { DisciplineEventArgs, EventType } from './patterns/DisciplineEventArgs';
 import { DisciplineFactory } from './factories/DisciplineFactory';
 import { Discipline } from './models/Discipline';
+import { Group } from './models/Group';
+import { EquipmentRegistry, EquipmentType } from './models/Equipment';
+import { ActivityType } from './models/Activity';
+import { DisciplineType } from './models/DisciplineType';
 
 class ConsoleLogger implements IDisciplineObserver {
   update(eventArgs: DisciplineEventArgs): void {
-    console.log(`[${eventArgs.timestamp.toISOString()}] ${eventArgs.sender}: ${eventArgs.message}`);
+    let logMessage = `[${eventArgs.timestamp.toISOString()}] ${eventArgs.sender}: ${eventArgs.message}`;
+
+    switch (eventArgs.eventType) {
+      case EventType.ACTIVITY_COMPLETED:
+        if (eventArgs.activityData?.grade) {
+          logMessage += ` (Grade: ${eventArgs.activityData.grade}${eventArgs.activityData.hasBonus ? ' + Bonus' : ''})`;
+        }
+        break;
+      case EventType.EXAM_ADMISSION_DENIED:
+        logMessage += ` [REASON: ${eventArgs.studentData?.reason}]`;
+        break;
+      case EventType.BONUS_APPLIED:
+        logMessage += ` [BONUS APPLIED]`;
+        break;
+    }
+
+    console.log(logMessage);
   }
 }
 
@@ -18,10 +38,13 @@ class UniversityManagementSystem {
   private teachers: Teacher[] = [];
   private students: Student[] = [];
   private disciplines: Discipline[] = [];
+  private groups: Group[] = [];
+  private equipmentRegistry: EquipmentRegistry;
 
   constructor() {
     this.notifier = new DisciplineNotifier();
     this.logger = new ConsoleLogger();
+    this.equipmentRegistry = EquipmentRegistry.getInstance();
     this.notifier.subscribe(this.logger);
 
     this.initializeDefaultData();
@@ -52,10 +75,43 @@ class UniversityManagementSystem {
       new Student('Olivia')
     ];
 
+    this.groups = [
+      new Group(
+        'Group A',
+        1,
+        this.students.slice(0, 8).map((s) => s.getId())
+      ),
+      new Group(
+        'Group B',
+        2,
+        this.students.slice(8, 15).map((s) => s.getId())
+      ),
+      new Group(
+        'Group C',
+        3,
+        this.students.slice(15).map((s) => s.getId())
+      )
+    ];
+
     this.disciplines = [
-      DisciplineFactory.createDiscipline('physics', this.teachers[0], this.notifier),
-      DisciplineFactory.createDiscipline('english', this.teachers[1], this.notifier),
-      DisciplineFactory.createDiscipline('math', this.teachers[2], this.notifier)
+      DisciplineFactory.createDiscipline(
+        DisciplineType.PHYSICS,
+        this.teachers[0],
+        this.notifier,
+        this.groups[0]
+      ),
+      DisciplineFactory.createDiscipline(
+        DisciplineType.ENGLISH,
+        this.teachers[1],
+        this.notifier,
+        this.groups[1]
+      ),
+      DisciplineFactory.createDiscipline(
+        DisciplineType.MATH,
+        this.teachers[2],
+        this.notifier,
+        this.groups[0]
+      )
     ];
   }
 
@@ -66,18 +122,20 @@ class UniversityManagementSystem {
       console.log('2. Manage Students');
       console.log('3. Manage Teachers');
       console.log('4. Manage Disciplines');
-      console.log('5. View Notifications');
-      console.log('6. Exit');
+      console.log('5. Manage Activities');
+      console.log('6. Manage Equipment');
+      console.log('7. View Notifications');
+      console.log('8. Exit');
 
       const { choice } = await inquirer.prompt([
         {
           type: 'input',
           name: 'choice',
-          message: 'Enter your choice (1-6):',
+          message: 'Enter your choice (1-8):',
           validate: (input) => {
             const num = parseInt(input);
-            if (isNaN(num) || num < 1 || num > 6) {
-              return 'Please enter a number between 1 and 6';
+            if (isNaN(num) || num < 1 || num > 8) {
+              return 'Please enter a number between 1 and 8';
             }
             return true;
           }
@@ -86,7 +144,7 @@ class UniversityManagementSystem {
 
       const choiceNum = parseInt(choice);
 
-      if (choiceNum === 6) {
+      if (choiceNum === 8) {
         console.log('\nGoodbye!');
         break;
       }
@@ -96,7 +154,9 @@ class UniversityManagementSystem {
         2: 'students',
         3: 'teachers',
         4: 'disciplines',
-        5: 'notifications'
+        5: 'activities',
+        6: 'equipment',
+        7: 'notifications'
       };
 
       await this.handleMenuAction(actionMap[choiceNum]);
@@ -116,6 +176,12 @@ class UniversityManagementSystem {
         break;
       case 'disciplines':
         await this.manageDisciplines();
+        break;
+      case 'activities':
+        await this.manageActivities();
+        break;
+      case 'equipment':
+        await this.manageEquipment();
         break;
       case 'notifications':
         await this.viewNotifications();
@@ -469,15 +535,21 @@ class UniversityManagementSystem {
         name: 'type',
         message: 'Select discipline type:',
         choices: [
-          { name: 'Physics', value: 'physics' },
-          { name: 'English', value: 'english' },
-          { name: 'Math', value: 'math' }
+          { name: 'Physics', value: DisciplineType.PHYSICS },
+          { name: 'English', value: DisciplineType.ENGLISH },
+          { name: 'Math', value: DisciplineType.MATH }
         ]
       }
     ]);
 
     const selectedTeacher = this.teachers.find((t) => t.getName() === teacherName)!;
-    const newDiscipline = DisciplineFactory.createDiscipline(type, selectedTeacher, this.notifier);
+    const selectedGroup = this.groups[0];
+    const newDiscipline = DisciplineFactory.createDiscipline(
+      type,
+      selectedTeacher,
+      this.notifier,
+      selectedGroup
+    );
 
     this.disciplines.push(newDiscipline);
 
@@ -619,6 +691,317 @@ class UniversityManagementSystem {
     console.log('\n=== Recent Notifications ===\n');
     console.log('Notification log is displayed in real-time as events occur.');
     console.log('Check the console output above for recent system events.');
+  }
+
+  private async manageActivities(): Promise<void> {
+    while (true) {
+      console.log('\n=== Activity Management ===');
+      console.log('1. View Discipline Activities');
+      console.log('2. Complete Activity');
+      console.log('3. Submit Activity');
+      console.log('4. View Student Progress');
+      console.log('5. Back to Main Menu');
+
+      const { choice } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'choice',
+          message: 'Enter your choice (1-5):',
+          validate: (input) => {
+            const num = parseInt(input);
+            if (isNaN(num) || num < 1 || num > 5) {
+              return 'Please enter a number between 1 and 5';
+            }
+            return true;
+          }
+        }
+      ]);
+
+      const choiceNum = parseInt(choice);
+
+      if (choiceNum === 5) break;
+
+      switch (choiceNum) {
+        case 1:
+          await this.viewDisciplineActivities();
+          break;
+        case 2:
+          await this.completeActivity();
+          break;
+        case 3:
+          await this.submitActivity();
+          break;
+        case 4:
+          await this.viewStudentProgress();
+          break;
+      }
+    }
+  }
+
+  private async viewDisciplineActivities(): Promise<void> {
+    if (this.disciplines.length === 0) {
+      console.log('\nNo disciplines available.');
+      return;
+    }
+
+    const { disciplineName } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'disciplineName',
+        message: 'Select discipline:',
+        choices: this.disciplines.map((d) => ({ name: d.getName(), value: d.getName() }))
+      }
+    ]);
+
+    const discipline = this.disciplines.find((d) => d.getName() === disciplineName)!;
+    const activities = discipline.getActivities();
+
+    console.log(`\n=== Activities for ${discipline.getName()} ===\n`);
+    activities.forEach((activity, index) => {
+      console.log(`${index + 1}. ${activity.name} (${activity.type})`);
+      console.log(`   Status: ${activity.getStatus()}`);
+      if (activity.grade) {
+        console.log(`   Grade: ${activity.grade}`);
+      }
+      console.log('');
+    });
+  }
+
+  private async completeActivity(): Promise<void> {
+    if (this.disciplines.length === 0) {
+      console.log('\nNo disciplines available.');
+      return;
+    }
+
+    if (this.students.length === 0) {
+      console.log('\nNo students available.');
+      return;
+    }
+
+    const { disciplineName, studentId, activityType, grade } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'disciplineName',
+        message: 'Select discipline:',
+        choices: this.disciplines.map((d) => ({ name: d.getName(), value: d.getName() }))
+      },
+      {
+        type: 'list',
+        name: 'studentId',
+        message: 'Select student:',
+        choices: this.students.map((s) => ({
+          name: `${s.getName()} (${s.getId()})`,
+          value: s.getId()
+        }))
+      },
+      {
+        type: 'list',
+        name: 'activityType',
+        message: 'Select activity type:',
+        choices: [
+          { name: 'Lecture', value: 'Lecture' },
+          { name: 'Practice', value: 'Practice' },
+          { name: 'Laboratory', value: 'Laboratory' },
+          { name: 'Coursework', value: 'Coursework' },
+          { name: 'Modular Test', value: 'Modular Test' },
+          { name: 'Exam', value: 'Exam' },
+          { name: 'Credit', value: 'Credit' }
+        ]
+      },
+      {
+        type: 'input',
+        name: 'grade',
+        message: 'Enter grade (1-100, optional):',
+        validate: (input) => {
+          if (input.trim() === '') return true;
+          const num = parseInt(input);
+          if (isNaN(num) || num < 1 || num > 100) {
+            return 'Please enter a number between 1 and 100';
+          }
+          return true;
+        },
+        filter: (input) => (input.trim() === '' ? undefined : parseInt(input))
+      }
+    ]);
+
+    const discipline = this.disciplines.find((d) => d.getName() === disciplineName)!;
+    const success = discipline.completeActivity(studentId, activityType as ActivityType, grade);
+
+    if (success) {
+      console.log(`\nActivity ${activityType} completed successfully!`);
+    } else {
+      console.log(
+        `\nFailed to complete activity ${activityType}. Check notifications for details.`
+      );
+    }
+  }
+
+  private async submitActivity(): Promise<void> {
+    if (this.disciplines.length === 0) {
+      console.log('\nNo disciplines available.');
+      return;
+    }
+
+    if (this.students.length === 0) {
+      console.log('\nNo students available.');
+      return;
+    }
+
+    const { disciplineName, studentId, activityType } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'disciplineName',
+        message: 'Select discipline:',
+        choices: this.disciplines.map((d) => ({ name: d.getName(), value: d.getName() }))
+      },
+      {
+        type: 'list',
+        name: 'studentId',
+        message: 'Select student:',
+        choices: this.students.map((s) => ({
+          name: `${s.getName()} (${s.getId()})`,
+          value: s.getId()
+        }))
+      },
+      {
+        type: 'list',
+        name: 'activityType',
+        message: 'Select activity type:',
+        choices: [
+          { name: 'Lecture', value: 'Lecture' },
+          { name: 'Practice', value: 'Practice' },
+          { name: 'Laboratory', value: 'Laboratory' },
+          { name: 'Coursework', value: 'Coursework' },
+          { name: 'Modular Test', value: 'Modular Test' },
+          { name: 'Exam', value: 'Exam' },
+          { name: 'Credit', value: 'Credit' }
+        ]
+      }
+    ]);
+
+    const discipline = this.disciplines.find((d) => d.getName() === disciplineName)!;
+    const success = discipline.submitActivity(studentId, activityType as ActivityType);
+
+    if (success) {
+      console.log(`\nActivity ${activityType} submitted successfully!`);
+    } else {
+      console.log(`\nFailed to submit activity ${activityType}. Check notifications for details.`);
+    }
+  }
+
+  private async viewStudentProgress(): Promise<void> {
+    if (this.disciplines.length === 0) {
+      console.log('\nNo disciplines available.');
+      return;
+    }
+
+    if (this.students.length === 0) {
+      console.log('\nNo students available.');
+      return;
+    }
+
+    const { disciplineName, studentId } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'disciplineName',
+        message: 'Select discipline:',
+        choices: this.disciplines.map((d) => ({ name: d.getName(), value: d.getName() }))
+      },
+      {
+        type: 'list',
+        name: 'studentId',
+        message: 'Select student:',
+        choices: this.students.map((s) => ({
+          name: `${s.getName()} (${s.getId()})`,
+          value: s.getId()
+        }))
+      }
+    ]);
+
+    const discipline = this.disciplines.find((d) => d.getName() === disciplineName)!;
+    const progress = discipline.getStudentProgress();
+
+    console.log(
+      `\n=== Progress for ${this.students.find((s) => s.getId() === studentId)?.getName()} in ${discipline.getName()} ===\n`
+    );
+
+    Object.entries(progress).forEach(([activityType, status]) => {
+      console.log(`${activityType}: ${status}`);
+    });
+
+    console.log(`\nCan take exam: ${discipline.canTakeExam() ? 'Yes' : 'No'}`);
+  }
+
+  private async manageEquipment(): Promise<void> {
+    while (true) {
+      console.log('\n=== Equipment Management ===');
+      console.log('1. View Equipment Status');
+      console.log('2. Toggle Equipment Availability');
+      console.log('3. Back to Main Menu');
+
+      const { choice } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'choice',
+          message: 'Enter your choice (1-3):',
+          validate: (input) => {
+            const num = parseInt(input);
+            if (isNaN(num) || num < 1 || num > 3) {
+              return 'Please enter a number between 1 and 3';
+            }
+            return true;
+          }
+        }
+      ]);
+
+      const choiceNum = parseInt(choice);
+
+      if (choiceNum === 3) break;
+
+      switch (choiceNum) {
+        case 1:
+          await this.viewEquipmentStatus();
+          break;
+        case 2:
+          await this.toggleEquipmentAvailability();
+          break;
+      }
+    }
+  }
+
+  private async viewEquipmentStatus(): Promise<void> {
+    const equipment = this.equipmentRegistry.getAllEquipment();
+
+    console.log('\n=== Equipment Status ===\n');
+    equipment.forEach((eq, index) => {
+      console.log(`${index + 1}. ${eq.name} (${eq.type})`);
+      console.log(`   Status: ${eq.getStatus()}`);
+      console.log(`   Provides Bonus: ${eq.providesBonus ? 'Yes' : 'No'}`);
+      console.log('');
+    });
+  }
+
+  private async toggleEquipmentAvailability(): Promise<void> {
+    const equipment = this.equipmentRegistry.getAllEquipment();
+
+    const { equipmentType } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'equipmentType',
+        message: 'Select equipment to toggle:',
+        choices: equipment.map((eq) => ({
+          name: `${eq.name} (${eq.getStatus()})`,
+          value: eq.type
+        }))
+      }
+    ]);
+
+    const currentEquipment = this.equipmentRegistry.getEquipment(equipmentType as EquipmentType);
+    if (currentEquipment) {
+      const newStatus = !currentEquipment.isAvailable;
+      this.equipmentRegistry.setEquipmentAvailability(equipmentType as EquipmentType, newStatus);
+      console.log(`\n${currentEquipment.name} is now ${newStatus ? 'Available' : 'Unavailable'}`);
+    }
   }
 }
 
