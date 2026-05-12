@@ -510,7 +510,7 @@ class UniversityManagementSystem {
       return;
     }
 
-    const { teacherName, type } = await inquirer.prompt([
+    const { name, teacherName, type } = await inquirer.prompt([
       {
         type: 'input',
         name: 'name',
@@ -533,7 +533,7 @@ class UniversityManagementSystem {
       {
         type: 'list',
         name: 'type',
-        message: 'Select discipline type:',
+        message: 'Select discipline type (physics, english, math):',
         choices: [
           { name: 'Physics', value: DisciplineType.PHYSICS },
           { name: 'English', value: DisciplineType.ENGLISH },
@@ -550,6 +550,8 @@ class UniversityManagementSystem {
       this.notifier,
       selectedGroup
     );
+
+    (newDiscipline as any).name = name.trim();
 
     this.disciplines.push(newDiscipline);
 
@@ -580,7 +582,13 @@ class UniversityManagementSystem {
       }
     ]);
 
-    const discipline = this.disciplines.find((d) => d.getName() === disciplineName)!;
+    const discipline = this.disciplines.find((d) => d.getName() === disciplineName);
+    
+    if (!discipline) {
+      console.log(`\nError: Discipline '${disciplineName}' not found.`);
+      return;
+    }
+    
     const availableStudents = this.students.filter((s) => !discipline.isStudentEnrolled(s.getId()));
 
     if (availableStudents.length === 0) {
