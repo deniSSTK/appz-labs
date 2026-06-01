@@ -3,8 +3,6 @@ import { CommentEntity } from './entities/CommentEntity';
 import { PostEntity } from './entities/PostEntity';
 import { UserEntity } from './entities/UserEntity';
 import { InMemoryDatabaseContext } from './inMemory/InMemoryDatabaseContext';
-import { UnitOfWork } from './UnitOfWork';
-import { IUnitOfWork } from './interfaces/IUnitOfWork';
 import { createPasswordHash } from '../shared/password';
 
 type SeedData = {
@@ -14,10 +12,8 @@ type SeedData = {
   comments: CommentEntity[];
 };
 
-export async function createSeededUnitOfWork(): Promise<IUnitOfWork> {
-  const seed = buildSeedData();
-  const context = new InMemoryDatabaseContext(seed);
-  return new UnitOfWork(context);
+export function createSeededDatabaseContext(): InMemoryDatabaseContext {
+  return new InMemoryDatabaseContext(buildSeedData());
 }
 
 function buildSeedData(): SeedData {

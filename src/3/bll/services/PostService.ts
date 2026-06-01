@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { IUnitOfWork } from '../../dal/interfaces/IUnitOfWork';
 import { AuthenticationError, NotFoundError, ValidationError } from '../errors/ServiceErrors';
 import { CreatePostInput } from '../inputs/CreatePostInput';
@@ -5,12 +6,14 @@ import { AuthService } from './AuthService';
 import { PostDto } from '../dto/PostDto';
 import { toPostDto, toPostSummaryDto } from '../mappers/BlogMapper';
 import { CommentService } from './CommentService';
+import { TYPES } from '../../di/types';
 
+@injectable()
 export class PostService {
   public constructor(
-    private readonly unitOfWork: IUnitOfWork,
-    private readonly authService: AuthService,
-    private readonly commentService: CommentService
+    @inject(TYPES.UnitOfWork) private readonly unitOfWork: IUnitOfWork,
+    @inject(TYPES.AuthService) private readonly authService: AuthService,
+    @inject(TYPES.CommentService) private readonly commentService: CommentService
   ) {}
 
   public async listPosts(): Promise<PostDto[]> {

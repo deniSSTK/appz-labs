@@ -1,14 +1,17 @@
+import { inject, injectable } from 'inversify';
 import { IUnitOfWork } from '../../dal/interfaces/IUnitOfWork';
-import {  NotFoundError, ValidationError } from '../errors/ServiceErrors';
+import { NotFoundError, ValidationError } from '../errors/ServiceErrors';
 import { CreateCommentInput } from '../inputs/CreateCommentInput';
 import { AuthService } from './AuthService';
 import { CommentDto } from '../dto/CommentDto';
 import { buildCommentTree } from '../mappers/BlogMapper';
+import { TYPES } from '../../di/types';
 
+@injectable()
 export class CommentService {
   public constructor(
-    private readonly unitOfWork: IUnitOfWork,
-    private readonly authService: AuthService
+    @inject(TYPES.UnitOfWork) private readonly unitOfWork: IUnitOfWork,
+    @inject(TYPES.AuthService) private readonly authService: AuthService
   ) {}
 
   public async addComment(input: CreateCommentInput): Promise<CommentDto> {

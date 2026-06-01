@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { IUnitOfWork } from '../../dal/interfaces/IUnitOfWork';
 import { createPasswordHash, verifyPassword } from '../../shared/password';
 import { RegisterUserInput } from '../inputs/RegisterUserInput';
@@ -5,11 +6,13 @@ import { LoginUserInput } from '../inputs/LoginUserInput';
 import { AuthenticationError, ValidationError } from '../errors/ServiceErrors';
 import { UserDto } from '../dto/UserDto';
 import { toUserDto } from '../mappers/BlogMapper';
+import { TYPES } from '../../di/types';
 
+@injectable()
 export class AuthService {
   private currentUserId: number | null = null;
 
-  public constructor(private readonly unitOfWork: IUnitOfWork) {}
+  public constructor(@inject(TYPES.UnitOfWork) private readonly unitOfWork: IUnitOfWork) {}
 
   public async register(input: RegisterUserInput): Promise<UserDto> {
     this.validateUsername(input.username);

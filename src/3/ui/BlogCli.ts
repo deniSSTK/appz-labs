@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import inquirer from 'inquirer';
 import { AuthService } from '../bll/services/AuthService';
 import { CategoryService } from '../bll/services/CategoryService';
@@ -5,6 +6,7 @@ import { CommentService } from '../bll/services/CommentService';
 import { PostService } from '../bll/services/PostService';
 import { AuthenticationError, ServiceError } from '../bll/errors/ServiceErrors';
 import { CommentDto } from '../bll/dto/CommentDto';
+import { TYPES } from '../di/types';
 
 type InquirerPrompt = {
   type: string;
@@ -24,12 +26,13 @@ type MenuOption<T> = {
   value: T;
 };
 
+@injectable()
 export class BlogCli {
   public constructor(
-    private readonly authService: AuthService,
-    private readonly categoryService: CategoryService,
-    private readonly postService: PostService,
-    private readonly commentService: CommentService
+    @inject(TYPES.AuthService) private readonly authService: AuthService,
+    @inject(TYPES.CategoryService) private readonly categoryService: CategoryService,
+    @inject(TYPES.PostService) private readonly postService: PostService,
+    @inject(TYPES.CommentService) private readonly commentService: CommentService
   ) {}
 
   public async run(): Promise<void> {

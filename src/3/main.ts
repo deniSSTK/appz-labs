@@ -1,17 +1,10 @@
-import { createSeededUnitOfWork } from './dal/bootstrap';
-import { AuthService } from './bll/services/AuthService';
-import { CategoryService } from './bll/services/CategoryService';
-import { CommentService } from './bll/services/CommentService';
-import { PostService } from './bll/services/PostService';
+import { createContainer } from './di/container';
 import { BlogCli } from './ui/BlogCli';
+import { TYPES } from './di/types';
 
 async function main(): Promise<void> {
-  const unitOfWork = await createSeededUnitOfWork();
-  const authService = new AuthService(unitOfWork);
-  const commentService = new CommentService(unitOfWork, authService);
-  const postService = new PostService(unitOfWork, authService, commentService);
-  const categoryService = new CategoryService(unitOfWork);
-  const cli = new BlogCli(authService, categoryService, postService, commentService);
+  const container = createContainer();
+  const cli = container.get<BlogCli>(TYPES.BlogCli);
   await cli.run();
 }
 
