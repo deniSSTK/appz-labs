@@ -11,7 +11,7 @@
     "format:check": "prettier . --check",
     "run:1": "cd src/1 && npx ts-node main.ts",
     "run:2": "cd src/2 && npx ts-node main.ts",
-    "run:3-4": "npx ts-node src/3-4/main.ts"
+    "run:4": "npx ts-node src/4/main.ts"
   },
   "dependencies": {
     "@types/inquirer": "^9.0.9",
