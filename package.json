@@ -11,6 +11,7 @@
     "format:check": "prettier . --check",
     "run:1": "npx ts-node src/1/main.ts",
     "run:2": "npx ts-node src/2/main.ts",
+    "run:3": "npx ts-node src/3/main.ts",
     "run:4": "npx ts-node src/4/main.ts"
   },
   "dependencies": {

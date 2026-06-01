@@ -583,12 +583,12 @@ class UniversityManagementSystem {
     ]);
 
     const discipline = this.disciplines.find((d) => d.getName() === disciplineName);
-    
+
     if (!discipline) {
       console.log(`\nError: Discipline '${disciplineName}' not found.`);
       return;
     }
-    
+
     const availableStudents = this.students.filter((s) => !discipline.isStudentEnrolled(s.getId()));
 
     if (availableStudents.length === 0) {
