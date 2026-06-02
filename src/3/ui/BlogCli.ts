@@ -15,6 +15,7 @@ type InquirerPrompt = {
   choices?: Array<{ name: string; value: string | number | null } | string>;
   default?: string | number;
   mask?: string;
+  validate?: (input: string) => boolean | string;
 };
 
 type InquirerApi = {
@@ -38,7 +39,7 @@ export class BlogCli {
   public async run(): Promise<void> {
     let exitRequested = false;
     while (!exitRequested) {
-      this.renderHeader();
+      await this.renderHeader();
       const action = await this.selectAction(inquirer);
 
       try {
@@ -182,12 +183,33 @@ export class BlogCli {
       content: string;
       categoryIndex: string;
     }>([
-      { type: 'input', name: 'title', message: 'Title' },
-      { type: 'input', name: 'content', message: 'Content' },
+      {
+        type: 'input',
+        name: 'title',
+        message: 'Title',
+        validate: (input) =>
+          input.trim().length >= 3 || 'Title must contain at least 3 characters'
+      },
+      {
+        type: 'input',
+        name: 'content',
+        message: 'Content',
+        validate: (input) =>
+          input.trim().length >= 10 || 'Content must contain at least 10 characters'
+      },
       {
         type: 'input',
         name: 'categoryIndex',
-        message: 'Enter the category number'
+        message: 'Enter the category number',
+        validate: (input) => {
+          const categoryIndex = Number(input);
+          return (
+            (Number.isInteger(categoryIndex) &&
+              categoryIndex >= 1 &&
+              categoryIndex <= categories.length) ||
+            `Please enter a number from 1 to ${categories.length}`
+          );
+        }
       }
     ]);
 
@@ -209,8 +231,6 @@ export class BlogCli {
       throw new AuthenticationError('Please sign in before adding a comment');
     }
     const postId = await this.selectPostId(inquirer, 'Choose a post to comment on');
-    const comments = await this.commentService.getCommentsForPost(postId);
-    const parentCommentId = await this.selectParentCommentId(inquirer, comments);
 
     const contentAnswer = await inquirer.prompt<{
       content: string;
@@ -218,9 +238,17 @@ export class BlogCli {
       {
         type: 'input',
         name: 'content',
-        message: 'Comment content'
+        message: 'Comment content',
+        validate: (input) => input.trim().length > 0 || 'Comment content cannot be empty'
       }
     ]);
+
+    const comments = await this.commentService.getCommentsForPost(postId);
+    const parentCommentId =
+      comments.length > 0 ? await this.selectParentCommentId(inquirer, comments) : null;
+    if (comments.length === 0) {
+      this.writeLine('No existing comments. Adding a top-level comment.');
+    }
 
     const comment = await this.commentService.addComment({
       postId,
@@ -296,8 +324,12 @@ export class BlogCli {
     return options[parentIndex - 1].value;
   }
 
-  private renderHeader(): void {
-    const status = this.authService.isAuthenticated() ? 'signed in' : 'guest';
+  private async renderHeader(): Promise<void> {
+    let status = 'guest';
+    if (this.authService.isAuthenticated()) {
+      const currentUser = await this.authService.getCurrentUser();
+      status = currentUser ? `signed in as ${currentUser.displayName}` : 'signed in';
+    }
     this.writeLine('');
     this.writeLine('Blog Platform');
     this.writeLine(`Current status: ${status}`);
